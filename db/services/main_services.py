@@ -1,5 +1,6 @@
 from db.base import async_session_maker
-from db.models import (UserModel, SessionModel)
+from db.models import (UserModel, SessionModel, TestingModel, TestModel, CategoryModel, SettingModel, AnswerModel,
+                       ResultModel, UserTestAnswerModel, UserTestingModel)
 from db.services.base_service import BaseService
 
 
@@ -11,4 +12,48 @@ class UserService(BaseService[UserModel]):
 class SessionService(BaseService[SessionModel]):
     model = SessionModel
     session_maker = async_session_maker
+
+
+class TestingService(BaseService[TestingModel]):
+    model = TestingModel
+    session_maker = async_session_maker
+
+
+class TestService(BaseService[TestModel]):
+    model = TestModel
+    session_maker = async_session_maker
+
+
+class CategoryService(BaseService[CategoryModel]):
+    model = CategoryModel
+    session_maker = async_session_maker
+
+
+class SettingService(BaseService[SettingModel]):
+    model = SettingModel
+    session_maker = async_session_maker
+
+
+class AnswerService(BaseService[AnswerModel]):
+    model = AnswerModel
+    session_maker = async_session_maker
+
+
+class ResultService(BaseService[ResultModel]):
+    model = ResultModel
+    session_maker = async_session_maker
+
+
+class UserTestAnswerService(BaseService[UserTestAnswerModel]):
+    model = UserTestAnswerModel
+    session_maker = async_session_maker
+
+
+class UserTestingService(BaseService[UserTestingModel]):
+    model = UserTestingModel
+    session_maker = async_session_maker
+
+
+
+
 
