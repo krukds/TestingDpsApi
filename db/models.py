@@ -18,6 +18,8 @@ class UserModel(Base):
     first_name = Column(String(255))
     last_name = Column(String(255))
     phone = Column(String(255))
+    location_id = Column(Integer, ForeignKey('location.id'))
+    department_id = Column(Integer, ForeignKey('department.id'))
 
     def __repr__(self) -> str:
         return (
@@ -37,4 +39,76 @@ class SessionModel(Base):
         return (
             f'SessionModel(id={self.id}, user_id={self.user_id})'
         )
+
+
+class LocationModel(Base):
+    __tablename__ = 'location'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), unique=True, nullable=False)
+
+
+class DepartmentModel(Base):
+    __tablename__ = 'department'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), unique=True, nullable=False)
+
+
+class TestingModel(Base):
+    __tablename__ = 'testing'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    time = Column(Integer, nullable=False)
+
+
+class TestModel(Base):
+    __tablename__ = 'test'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    category_id = Column(Integer, ForeignKey('category.id'), nullable=True)
+    testing_id = Column(Integer, ForeignKey('testing.id'), nullable=True)
+
+
+class CategoryModel(Base):
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+class SettingModel(Base):
+    __tablename__ = 'setting'
+    id = Column(Integer, primary_key=True)
+    category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
+    test_amount = Column(Integer, nullable=False)
+
+
+class UserTestingModel(Base):
+    __tablename__ = 'user_testing'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    testing_id = Column(Integer, ForeignKey('testing.id'), nullable=False)
+
+
+class UserTestAnswerModel(Base):
+    __tablename__ = 'user_test_answer'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    answer_id = Column(Integer, ForeignKey('answer.id'), nullable=False)
+    test_id = Column(Integer, ForeignKey('test.id'), nullable=False)
+    time = Column(DateTime, nullable=False)
+
+
+class AnswerModel(Base):
+    __tablename__ = 'answer'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    test_id = Column(Integer, ForeignKey('test.id'), nullable=False)
+    is_correct = Column(Boolean, nullable=False)
+
+
+class ResultModel(Base):
+    __tablename__ = 'result'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    rating = Column(Integer, nullable=False)
+    time = Column(DateTime, nullable=False)
 
