@@ -94,7 +94,6 @@ class UserTestAnswerModel(Base):
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     answer_id = Column(Integer, ForeignKey('answer.id'), nullable=False)
     test_id = Column(Integer, ForeignKey('test.id'), nullable=False)
-    time = Column(DateTime, nullable=False)
 
 
 class AnswerModel(Base):
@@ -109,6 +108,7 @@ class ResultModel(Base):
     __tablename__ = 'result'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    testing_id = Column(Integer, ForeignKey('testing.id'), nullable=False)
     rating = Column(Integer, nullable=False)
-    time = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False)
 

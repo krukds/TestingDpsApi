@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter, Depends
 
-import auth_app
+import auth_app, locations_app, categories_app, departments_app, testings_app, tests_app, answers_app,\
+    settings_app, results_app, user_test_answers_app, user_testings_app
 
 
 @asynccontextmanager
@@ -25,15 +26,19 @@ api_router = APIRouter(
 )
 
 api_router.include_router(auth_app.router)
-# api_router.include_router(attractions_app.router)
-# secured_router.include_router(attraction_tickets_app.router)
-# api_router.include_router(events_app.router)
+api_router.include_router(locations_app.router)
+api_router.include_router(categories_app.router)
+api_router.include_router(departments_app.router)
+api_router.include_router(testings_app.router)
+api_router.include_router(tests_app.router)
+api_router.include_router(answers_app.router)
+api_router.include_router(settings_app.router)
+api_router.include_router(results_app.router)
+api_router.include_router(user_test_answers_app.router)
+api_router.include_router(user_testings_app.router)
+
 # secured_router.include_router(event_tickets_app.router)
-# api_router.include_router(restaurants_app.router)
-# api_router.include_router(tags_app.router)
-# api_router.include_router(ages_app.router)
-# api_router.include_router(statistics_app.router)
-# api_router.include_router(logging_app.router)
+
 app.include_router(api_router)
 # app.include_router(secured_router)
 # app.include_router(frontend_app.router)
