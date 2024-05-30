@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter, Depends
+from starlette.middleware.cors import CORSMiddleware
 
 import auth_app, locations_app, categories_app, departments_app, testings_app, tests_app, answers_app,\
     settings_app, results_app, user_test_answers_app, user_testings_app
@@ -14,6 +15,20 @@ async def lifespan(_: FastAPI):
 app = FastAPI(
     title="Testing Dps Api",
     lifespan=lifespan
+)
+
+# Дозволені origins
+origins = [
+    "http://localhost:4200",  # Дозволити Angular додаток
+]
+
+# Додавання CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Дозволені origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Дозволити всі методи (GET, POST, PUT, DELETE, і т.д.)
+    allow_headers=["*"],  # Дозволити всі заголовки
 )
 
 secured_router = APIRouter(
