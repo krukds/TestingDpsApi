@@ -21,6 +21,9 @@ class UserModel(Base):
     location_id = Column(Integer, ForeignKey('location.id'))
     department_id = Column(Integer, ForeignKey('department.id'))
 
+    location = relationship("LocationModel", back_populates="users")
+    department = relationship("DepartmentModel", back_populates="users")
+
     def __repr__(self) -> str:
         return (
             f'UserModel(id={self.id}, name={self.email})'
@@ -46,11 +49,15 @@ class LocationModel(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True, nullable=False)
 
+    users = relationship("UserModel", back_populates="location")
+
 
 class DepartmentModel(Base):
     __tablename__ = 'department'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True, nullable=False)
+
+    users = relationship("UserModel", back_populates="department")
 
 
 class TestingModel(Base):
@@ -65,13 +72,13 @@ class TestModel(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'), nullable=True)
-    testing_id = Column(Integer, ForeignKey('testing.id'), nullable=True)
 
 
 class CategoryModel(Base):
     __tablename__ = 'category'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    testing_id = Column(Integer, ForeignKey('testing.id'), nullable=False)
 
 
 class SettingModel(Base):

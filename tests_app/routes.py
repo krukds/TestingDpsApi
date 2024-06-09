@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 from starlette.status import HTTP_404_NOT_FOUND
 
-from db.models import TestModel
-from db.services.main_services import TestService
+from db.models import TestModel, CategoryModel
+from db.services.main_services import TestService, CategoryService
 from .schemes import TestPayload, TestResponse
 
 router = APIRouter(
@@ -12,8 +13,22 @@ router = APIRouter(
 
 
 @router.get("")
-async def get_all_tests() -> list[TestResponse]:
-    tests = await TestService.select()
+async def get_all_tests(
+    category_id: int = None
+) -> list[TestResponse]:
+
+    base_query = select(TestModel)
+
+    if category_id is not None:
+        category: CategoryModel = await CategoryService.select_one(
+            CategoryModel.id == category_id
+        )
+        if not category:
+            raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No category with this id found")
+
+        base_query = base_query.where(TestModel.category_id==category_id)
+
+    tests = await TestService.execute(base_query)
     if not tests:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No tests found")
 

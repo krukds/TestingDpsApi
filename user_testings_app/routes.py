@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 from starlette.status import HTTP_404_NOT_FOUND
 
 from db.models import UserTestingModel
@@ -12,8 +13,19 @@ router = APIRouter(
 
 
 @router.get("")
-async def get_all_user_testings() -> list[UserTestingResponse]:
-    user_testings = await UserTestingService.select()
+async def get_all_user_testings(
+        user_id: int = None,
+        testing_id: int = None
+) -> list[UserTestingResponse]:
+    base_query = select(UserTestingModel)
+
+    if user_id is not None:
+        base_query = base_query.where(UserTestingModel.user_id == user_id)
+
+    if testing_id is not None:
+        base_query = base_query.where(UserTestingModel.testing_id == testing_id)
+
+    user_testings = await UserTestingService.execute(base_query)
     if not user_testings:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No user testings found")
 
@@ -64,15 +76,15 @@ async def get_user_testing_by_id(
 #     return UserTestingResponse(**updated_user_testing.__dict__)
 #
 #
-# @router.delete("/{user_testing_id}")
-# async def delete_user_testing(
-#         user_testing_id: int
-# ):
-#     user_testing: UserTestingModel = await UserTestingService.select_one(
-#         UserTestingModel.id == user_testing_id
-#     )
-#     if not user_testing:
-#         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No user testing with this id found")
-#     await UserTestingService.delete(id=user_testing_id)
-#
-#     return {"status": "success"}
+@router.delete("/{user_testing_id}")
+async def delete_user_testing(
+        user_testing_id: int
+):
+    user_testing: UserTestingModel = await UserTestingService.select_one(
+        UserTestingModel.id == user_testing_id
+    )
+    if not user_testing:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No user testing with this id found")
+    await UserTestingService.delete(id=user_testing_id)
+
+    return {"status": "success"}

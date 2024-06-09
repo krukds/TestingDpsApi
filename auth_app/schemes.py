@@ -35,8 +35,19 @@ class UserResponse(BaseModel):
     first_name: str
     last_name: str
     phone: str
-    location_id: Optional[int] = None
-    department_id: Optional[int] = None
+    location_id: int
+    department_id: int
+
+
+class UserDetailResponse(BaseModel):
+    id: int
+    email: str
+    password: str
+    first_name: str
+    last_name: str
+    phone: str
+    location: str
+    department: str
 
 
 class UserPayload(BaseModel):

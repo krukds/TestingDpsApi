@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 from starlette.status import HTTP_404_NOT_FOUND
 
 from db.models import AnswerModel
@@ -12,8 +13,15 @@ router = APIRouter(
 
 
 @router.get("")
-async def get_all_answers() -> list[AnswerResponse]:
-    answers = await AnswerService.select()
+async def get_all_answers(
+    test_id: int = None
+) -> list[AnswerResponse]:
+    base_query = select(AnswerModel)
+
+    if test_id is not None:
+        base_query = base_query.where(AnswerModel.test_id==test_id)
+
+    answers = await AnswerService.execute(base_query)
     if not answers:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No answers found")
 

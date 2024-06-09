@@ -1,8 +1,11 @@
 import datetime
+from typing import Optional, List
 
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import ValidationError
+from sqlalchemy import select
+from sqlalchemy.orm import Query, joinedload
 from starlette import status
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -10,7 +13,7 @@ from db import UserModel
 from db.services import UserService
 from utils import datetime_now
 from .deps import get_current_active_user
-from .schemes import TokenResponse, SignupPayload, UserResponse, UserPayload
+from .schemes import TokenResponse, SignupPayload, UserResponse, UserPayload, UserDetailResponse
 from .utils import create_user_session
 
 router = APIRouter(
@@ -95,6 +98,19 @@ async def get_user_by_id(
     return UserResponse(**user.dict())
 
 
+@router.get("/email")
+async def get_user_by_email(
+        email: str
+) -> UserResponse:
+    user: UserModel = await UserService.select_one(
+        UserModel.email == email
+    )
+    if not user:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No user with this email found")
+
+    return UserResponse(**user.dict())
+
+
 @router.delete("/id")
 async def delete_user_by_id(
         user_id: int
@@ -121,3 +137,40 @@ async def update_user_by_id(
     updated_user = await UserService.save(user)
 
     return UserResponse(**updated_user.__dict__)
+
+
+@router.get("", response_model=List[UserDetailResponse])
+async def get_all_users(
+        location_id: int = None,
+        department_id: int = None
+) -> List[UserDetailResponse]:
+    base_query = select(UserModel).options(
+        joinedload(UserModel.location),
+        joinedload(UserModel.department)
+    )
+
+    if location_id is not None:
+        base_query = base_query.where(UserModel.location_id == location_id)
+
+    if department_id is not None:
+        base_query = base_query.where(UserModel.department_id == department_id)
+
+    users = await UserService.execute(base_query)
+
+
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+
+    return [
+        UserDetailResponse(
+            id=user.id,
+            email=user.email,
+            password=user.password,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            phone=user.phone,
+            location=user.location.name,
+            department=user.department.name
+        )
+        for user in users
+    ]
